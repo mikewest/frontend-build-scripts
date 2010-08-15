@@ -27,17 +27,25 @@ class CyclicInsertionError(RuntimeError):
     def __str__(self):
         return "Graph contains a cycle: `%s`" % " --> ".join( self.cycle )
 
+class NodeNotExists(RuntimeError):
+    pass
+
 class DAG(object):
     def __init__(self):
         self._nodes = {}
         self._edges = {}
 
     def nodes(self):
-        for id in self._nodes.keys():
-            yield self._nodes[id]
+        return self._nodes
 
     def contains(self, id):
         return self._nodes.has_key(id)
+
+    def neighbors(self, id):
+        if self.contains(id):
+            return self._edges[id].keys()
+        else:
+            raise NodeNotExists(id)
 
     def addNode(self, node):
         """
@@ -63,6 +71,9 @@ class DAG(object):
             is_cyclic = self.detectCycles( fromId, toId )
             if is_cyclic:
                 raise CyclicInsertionError(is_cyclic)
+        else:
+            raise NodeNotExists( toId if self.contains( fromId ) else fromId )
+                
 
     def addEdgesFromNode(self, fromId, toIds):
         for to in toIds:
