@@ -1,0 +1,9 @@
+/**
+ *  c.css
+ *
+ *  @module     test.c
+ *  @requires   test.a
+ */
+cite {
+    font-weight:    700;
+}

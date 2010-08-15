@@ -1,0 +1,9 @@
+/**
+ *  a.css
+ *
+ *  @module     test.a
+ *  @requires   test.b
+ */
+a {
+    font-weight:    700;
+}
