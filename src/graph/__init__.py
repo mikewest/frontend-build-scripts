@@ -98,3 +98,28 @@ class DAG(object):
             return []
 
         return dfs( fromId, toId, [ fromId ] )
+
+    def topologicalSort(self, nodes):
+        def noIncomingEdges( keys ):
+            allNodes = set( keys )
+            for key in keys:
+                for edge in self.neighbors( key ):
+                    allNodes.discard( edge )
+            return allNodes
+
+        sorted      = []
+        visited     = set()
+        startnodes  = noIncomingEdges( nodes ) 
+
+        def visit( node ):
+            """This will die horribly if the graph contains cycles.  Beware!"""
+            if node not in visited:
+                visited.add( node )
+                for neighbor in self.neighbors( node ):
+                    visit( neighbor )
+                sorted.append( node )
+
+        for node in startnodes:
+            visit( node )
+
+        return sorted

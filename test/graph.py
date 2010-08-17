@@ -20,7 +20,9 @@ class MockNode(Node):
 class TestDAG(unittest.TestCase):
     def setUp(self):
         self.graph = DAG()
-
+#
+#   Insertion
+#
     def test_insertion(self):
         self.assertEqual( len(self.graph.nodes()), 0 )
         self.graph.addNode(MockNode('id1'))
@@ -36,7 +38,9 @@ class TestDAG(unittest.TestCase):
         self.graph.addEdge('id1', 'id2')
         self.assertEquals(self.graph.neighbors('id1'), [ 'id2' ])
         self.assertEquals(self.graph.neighbors('id2'), [])
-
+#
+#   Cycle Detection
+#
     def test_cycledetection_simple(self):
         self.graph.addNode(MockNode('id1'))
         self.graph.addNode(MockNode('id2'))
@@ -50,8 +54,34 @@ class TestDAG(unittest.TestCase):
             if prev is not None:
                 self.graph.addEdge(prev, x)
             prev = x
-        self.assertRaises(CyclicInsertionError, self.graph.addEdge(99, 0))
+        self.assertRaises(CyclicInsertionError, lambda: self.graph.addEdge(99, 0))
+#
+#   Topological Sort
+#
+    def test_topologicalsort_empty(self):
+        self.assertEquals( [], self.graph.topologicalSort(self.graph.nodes()))
 
+    def test_topologicalsort_one(self):
+        self.graph.addNode(MockNode('id1'))
+        self.assertEquals( ['id1'], self.graph.topologicalSort(self.graph.nodes()))
+
+    def test_topologicalsort_two(self):
+        self.graph.addNode(MockNode('id1'))
+        self.graph.addNode(MockNode('id2'))
+        self.graph.addEdge('id1','id2')
+        self.assertEquals( ['id2', 'id1'], self.graph.topologicalSort(self.graph.nodes()))
+
+    def test_topologicalsort_many(self):
+        prev = None
+        list = []
+        for x in range( 100 ):
+            self.graph.addNode(MockNode(x))
+            if prev is not None:
+                self.graph.addEdge(prev, x)
+            prev = x
+            list.append( x )
+        list.reverse()
+        self.assertEquals( list, self.graph.topologicalSort(self.graph.nodes()))
 
 if __name__ == '__main__':
     unittest.main()
